@@ -1,9 +1,9 @@
-name: Deploy Node.js to Azure Web App
+name: Deploy to Azure Web App
 
 on:
   push:
     branches:
-      - main  # Or your default branch
+      - main
   workflow_dispatch:
 
 jobs:
@@ -11,19 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v3
     
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: '16.x'
+        node-version: '18.x'
     
-    - name: npm install (without build)
+    - name: Install dependencies
       run: npm install
     
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
+    - name: Login to Azure
+      uses: azure/login@v1.4.6
       with:
-        app-name: 'WeatherWeGo'  #
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2.2.10
+      with:
+        app-name: 'WeatherWeGo' # Replace with your app name
         package: .
